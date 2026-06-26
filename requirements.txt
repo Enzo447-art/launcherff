@@ -2,6 +2,5 @@ Flask==3.0.3
 Flask-CORS==4.0.1
 Flask-SQLAlchemy==3.1.1
 Werkzeug==3.0.3
-pyinstaller==6.16.0
-
+python-dotenv==1.0.1
 gunicorn==23.0.0
