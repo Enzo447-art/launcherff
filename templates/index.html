@@ -4,43 +4,42 @@
     <meta charset="UTF-8">
     <title>Horror Launcher</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #1a0000; color: #ffdddd; text-align: center; padding: 50px; }
-        .container { max-width: 700px; margin: auto; background: rgba(0,0,0,0.9); padding: 40px; border-radius: 15px; border: 3px solid #ff4444; }
-        button { padding: 15px 40px; font-size: 20px; background: #ff4444; color: white; border: none; border-radius: 8px; cursor: pointer; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1a0000, #330000);
+            color: #ffdddd;
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: rgba(0,0,0,0.85);
+            padding: 50px;
+            border-radius: 15px;
+            border: 3px solid #ff4444;
+        }
+        button {
+            padding: 18px 50px;
+            font-size: 22px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 15px;
+        }
         button:hover { background: #ff6666; }
-        #status { margin-top: 20px; font-size: 18px; min-height: 30px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🚀 Horror Launcher</h1>
+        <h1>🚀 HORROR LAUNCHER</h1>
         <p>Minecraft 1.19.2 Forge</p>
-        <button onclick="startCompile()">🔨 Compiler le Launcher (EXE)</button>
-        <p id="status">Prêt</p>
+        <button onclick="window.location.href='/download'">📥 Télécharger le Launcher (EXE)</button>
+        <p style="margin-top:30px; font-size:14px;">
+            Mods chargés automatiquement depuis l'API
+        </p>
     </div>
-
-    <script>
-        function startCompile() {
-            const status = document.getElementById('status');
-            status.textContent = '🔄 Compilation en cours...';
-            
-            fetch('/compile')
-                .then(() => {
-                    let check = setInterval(() => {
-                        fetch('/status')
-                            .then(r => r.json())
-                            .then(data => {
-                                if (data.exe_ready) {
-                                    clearInterval(check);
-                                    status.textContent = '✅ Prêt ! Téléchargement...';
-                                    window.location.href = '/download';
-                                } else if (!data.running) {
-                                    status.textContent = data.message;
-                                }
-                            });
-                    }, 4000);
-                });
-        }
-    </script>
 </body>
 </html>
