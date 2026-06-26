@@ -19,26 +19,38 @@
             border-radius: 15px;
             border: 3px solid #ff4444;
         }
+        h1 { color: #ff4444; margin-bottom: 10px; }
         button {
-            padding: 18px 50px;
-            font-size: 22px;
+            padding: 18px 40px;
+            font-size: 20px;
             background: #ff4444;
             color: white;
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            margin: 15px;
+            margin: 12px;
+            width: 85%;
         }
         button:hover { background: #ff6666; }
+        .zip-btn { background: #00aa44; }
+        .zip-btn:hover { background: #00cc55; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🚀 HORROR LAUNCHER</h1>
         <p>Minecraft 1.19.2 Forge</p>
-        <button onclick="window.location.href='/download'">📥 Télécharger le Launcher (EXE)</button>
-        <p style="margin-top:30px; font-size:14px;">
-            Mods chargés automatiquement depuis l'API
+        
+        <button onclick="window.location.href='/download'">
+            📥 Télécharger le Launcher (EXE)
+        </button>
+        
+        <button class="zip-btn" onclick="window.location.href='/modpack'">
+            📦 Télécharger le Pack Mods (ZIP)
+        </button>
+
+        <p style="margin-top: 35px; font-size: 14px; opacity: 0.8;">
+            Le launcher extraira automatiquement le ZIP dans le dossier mods
         </p>
     </div>
 </body>
