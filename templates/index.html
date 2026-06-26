@@ -5,23 +5,62 @@
     <title>Horror Launcher</title>
     <style>
         body { font-family: Arial; background: #1a0000; color: #ffdddd; text-align: center; padding: 60px; }
-        .container { max-width: 700px; margin: auto; background: rgba(0,0,0,0.85); padding: 50px; border-radius: 15px; border: 3px solid #ff4444; }
-        button { padding: 18px 50px; font-size: 22px; background: #ff4444; color: white; border: none; border-radius: 10px; cursor: pointer; }
+        .container { max-width: 700px; margin: auto; background: rgba(0,0,0,0.9); padding: 50px; border-radius: 15px; border: 3px solid #ff4444; }
+        button { padding: 18px 50px; font-size: 22px; background: #ff4444; color: white; border: none; border-radius: 10px; cursor: pointer; margin: 10px; }
         button:hover { background: #ff6666; }
+        button:disabled { background: #666; cursor: not-allowed; }
+        #status { margin-top: 25px; font-size: 18px; min-height: 50px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🚀 Horror Launcher</h1>
-        <p>Minecraft 1.19.2 Forge + Mods auto</p>
-        <button onclick="startCompile()">🔨 Compiler & Télécharger l'EXE</button>
-        <p id="status" style="margin-top:25px; font-size:18px;"></p>
+        <p>Minecraft 1.19.2 Forge + Mods</p>
+        
+        <button id="compileBtn" onclick="startCompile()">🔨 Compiler & Télécharger l'EXE</button>
+        <p id="status">Prêt</p>
     </div>
 
     <script>
+        let checking = false;
+
         function startCompile() {
-            document.getElementById('status').innerHTML = '🔄 Compilation en cours... (20 à 40 secondes)';
-            fetch('/compile').then(() => window.location.reload());
+            const btn = document.getElementById('compileBtn');
+            const status = document.getElementById('status');
+            
+            btn.disabled = true;
+            status.innerHTML = '🔄 Compilation en cours... (20 à 45 secondes)';
+
+            fetch('/compile')
+                .then(response => response.json())
+                .then(data => {
+                    checkStatus();
+                });
+        }
+
+        function checkStatus() {
+            if (checking) return;
+            checking = true;
+
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    const statusEl = document.getElementById('status');
+                    
+                    if (data.running) {
+                        statusEl.innerHTML = '🔄 Compilation en cours...';
+                        setTimeout(checkStatus, 3000);
+                    } 
+                    else if (data.exe_ready) {
+                        statusEl.innerHTML = '✅ Compilation terminée ! Téléchargement...';
+                        window.location.href = '/download';
+                    } 
+                    else {
+                        statusEl.innerHTML = '❌ ' + data.message;
+                        document.getElementById('compileBtn').disabled = false;
+                    }
+                    checking = false;
+                });
         }
     </script>
 </body>
