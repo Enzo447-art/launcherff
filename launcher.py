@@ -99,27 +99,56 @@ class HorrorLauncher:
             self.progress.pack_forget()
 
     def download_mods(self):
-        self.log("📥 Téléchargement des mods depuis l'API...")
-        try:
-            r = requests.get(MODS_API, timeout=20)
-            if r.status_code != 200:
-                self.log("⚠️ API mods indisponible", "#ffaa00")
-                return
+    self.log("📥 Création du dossier mods et téléchargement...", "#ffff00")
+    
+    try:
+        mods_dir = MINECRAFT_DIR / "mods"
+        mods_dir.mkdir(parents=True, exist_ok=True)   # Crée le dossier même si les parents n'existent pas
+        
+        # Optionnel : Création d'autres dossiers utiles
+        (MINECRAFT_DIR / "config").mkdir(exist_ok=True)
+        (MINECRAFT_DIR / "saves").mkdir(exist_ok=True)
 
-            data = r.json() if "json" in r.headers.get("content-type", "") else []
-            mods_dir = MINECRAFT_DIR / "mods"
-            mods_dir.mkdir(exist_ok=True)
+        self.log(f"📁 Dossier mods créé : {mods_dir}", "#00ff88")
 
-            for mod in data:
-                if isinstance(mod, dict) and "url" in mod:
-                    url = mod["url"]
-                    name = url.split("/")[-1]
-                    self.log(f"   → {name}")
-                    with open(mods_dir / name, "wb") as f:
-                        f.write(requests.get(url, timeout=30).content)
-            self.log("✅ Mods téléchargés !", "#00ff88")
-        except Exception as e:
-            self.log(f"⚠️ Erreur mods : {e}", "#ffaa00")
+        # Téléchargement des mods depuis ton API
+        url = f"https://horror-launcher-api.onrender.com/mods?version={MC_VERSION}&modloader=forge"
+        self.log("🌐 Connexion à l'API mods...", "#ffff00")
+        
+        r = requests.get(url, timeout=20)
+        
+        if r.status_code != 200:
+            self.log(f"⚠️ API a renvoyé {r.status_code}", "#ffaa00")
+            return
+
+        mod_list = r.json() if isinstance(r.json(), list) else []
+        
+        if not mod_list:
+            self.log("⚠️ Aucun mod trouvé sur l'API", "#ffaa00")
+            return
+
+        for mod in mod_list:
+            if isinstance(mod, dict) and mod.get("url"):
+                mod_url = mod["url"]
+                mod_name = mod.get("name") or mod_url.split("/")[-1]
+                
+                self.log(f"   ⬇️ Téléchargement : {mod_name}", "#ffff00")
+                
+                try:
+                    mod_response = requests.get(mod_url, timeout=60)
+                    if mod_response.status_code == 200:
+                        with open(mods_dir / mod_name, "wb") as f:
+                            f.write(mod_response.content)
+                        self.log(f"      ✅ {mod_name} OK", "#00ff88")
+                    else:
+                        self.log(f"      ❌ Erreur {mod_response.status_code} sur {mod_name}", "#ff4444")
+                except Exception as e:
+                    self.log(f"      ❌ Erreur téléchargement {mod_name}: {e}", "#ff4444")
+
+        self.log(f"✅ Tous les mods ont été téléchargés dans {mods_dir}", "#00ff88")
+
+    except Exception as e:
+        self.log(f"❌ Erreur générale lors du téléchargement des mods: {e}", "#ff4444")
 
     def launch_game(self):
         username = self.username_var.get().strip() or "HorrorPlayer"
